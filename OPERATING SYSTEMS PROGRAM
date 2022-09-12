@@ -1,4 +1,4 @@
-PROCESS CREATION AND TERMINATION
+1.PROCESS CREATION AND TERMINATION
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -30,7 +30,9 @@ int main() {
    }
    return 0;
 }
-FILE COPYING 
+
+
+2.FILE COPYING 
 #include <stdio.h>
 #include <stdlib.h> // For exit()
 
@@ -163,3 +165,272 @@ int main()
 	fclose(fptr2);
 	return 0;
 }
+
+3.FCFS SCHEDULING
+#include <stdio.h>
+// Function to find the waiting time for all processes
+int waitingtime(int proc[], int n,
+int burst_time[], int wait_time[]) {
+   // waiting time for first process is 0
+   wait_time[0] = 0;
+   // calculating waiting time
+   for (int i = 1; i < n ; i++ )
+   wait_time[i] = burst_time[i-1] + wait_time[i-1] ;
+   return 0;
+}
+// Function to calculate turn around time
+int turnaroundtime( int proc[], int n,
+int burst_time[], int wait_time[], int tat[]) {
+   // calculating turnaround time by adding
+   // burst_time[i] + wait_time[i]
+   int i;
+   for ( i = 0; i < n ; i++)
+   tat[i] = burst_time[i] + wait_time[i];
+   return 0;
+}
+//Function to calculate average time
+int avgtime( int proc[], int n, int burst_time[]) {
+   int wait_time[n], tat[n], total_wt = 0, total_tat = 0;
+   int i;
+   //Function to find waiting time of all processes
+   waitingtime(proc, n, burst_time, wait_time);
+   //Function to find turn around time for all processes
+   turnaroundtime(proc, n, burst_time, wait_time, tat);
+   //Display processes along with all details
+   printf("Processes  Burst   Waiting Turn around \n");
+   // Calculate total waiting time and total turn
+   // around time
+   for ( i=0; i<n; i++) {
+      total_wt = total_wt + wait_time[i];
+      total_tat = total_tat + tat[i];
+      printf(" %d\t  %d\t\t %d \t%d\n", i+1, burst_time[i], wait_time[i], tat[i]);
+   }
+   printf("Average waiting time = %f\n", (float)total_wt / (float)n);
+   printf("Average turn around time = %f\n", (float)total_tat / (float)n);
+   return 0;
+}
+// main function
+int main() {
+   //process id's
+   int proc[] = { 1, 2, 3};
+   int n = sizeof proc / sizeof proc[0];
+   //Burst time of all processes
+   int burst_time[] = {5, 8, 12};
+   avgtime(proc, n, burst_time);
+   return 0;
+} 
+
+4.Construct a scheduling program with C that selects the waiting process with the smallest execution time to execute next.
+#include<stdio.h>
+ int main()
+{
+    int bt[20],p[20],wt[20],tat[20],i,j,n,total=0,pos,temp;
+    float avg_wt,avg_tat;
+    printf("Enter number of process:");
+    scanf("%d",&n);
+  
+    printf("nEnter Burst Time:n");
+    for(i=0;i<n;i++)
+    {
+        printf("p%d:",i+1);
+        scanf("%d",&bt[i]);
+        p[i]=i+1;         
+    }
+  
+   //sorting of burst times
+    for(i=0;i<n;i++)
+    {
+        pos=i;
+        for(j=i+1;j<n;j++)
+        {
+            if(bt[j]<bt[pos])
+                pos=j;
+        }
+  
+        temp=bt[i];
+        bt[i]=bt[pos];
+        bt[pos]=temp;
+  
+        temp=p[i];
+        p[i]=p[pos];
+        p[pos]=temp;
+    }
+   
+    wt[0]=0;            
+  
+   
+    for(i=1;i<n;i++)
+    {
+        wt[i]=0;
+        for(j=0;j<i;j++)
+            wt[i]+=bt[j];
+  
+        total+=wt[i];
+    }
+  
+    avg_wt=(float)total/n;      
+    total=0;
+  
+    printf("nProcesst    Burst Time    tWaiting TimetTurnaround Time");
+    for(i=0;i<n;i++)
+    {
+        tat[i]=bt[i]+wt[i];   
+        total+=tat[i];
+        printf("np%dtt  %dtt    %dttt%d",p[i],bt[i],wt[i],tat[i]);
+    }
+  
+    avg_tat=(float)total/n;    
+    printf("nnAverage Waiting Time=%f",avg_wt);
+    printf("nAverage Turnaround Time=%fn",avg_tat);
+}
+
+5.BANKERS ALGORITHM IN C
+#include <stdio.h>
+ 
+int current[5][5], maximum_claim[5][5], available[5];
+int allocation[5] = {0, 0, 0, 0, 0};
+int maxres[5], running[5], safe = 0;
+int counter = 0, i, j, exec, resources, processes, k = 1;
+ 
+int main()
+{
+printf("\nEnter number of processes: ");
+     scanf("%d", &processes);
+ 
+     for (i = 0; i < processes; i++)
+{
+         running[i] = 1;
+         counter++;
+     }
+ 
+     printf("\nEnter number of resources: ");
+     scanf("%d", &resources);
+ 
+     printf("\nEnter Claim Vector:");
+     for (i = 0; i < resources; i++)
+{
+        scanf("%d", &maxres[i]);
+     }
+ 
+   printf("\nEnter Allocated Resource Table:\n");
+     for (i = 0; i < processes; i++)
+{
+        for(j = 0; j < resources; j++)
+{
+   scanf("%d", &current[i][j]);
+         }
+     }
+ 
+     printf("\nEnter Maximum Claim Table:\n");
+     for (i = 0; i < processes; i++)
+{
+         for(j = 0; j < resources; j++)
+{
+             scanf("%d", &maximum_claim[i][j]);
+         }
+     }
+ 
+printf("\nThe Claim Vector is: ");
+     for (i = 0; i < resources; i++)
+{
+        printf("\t%d", maxres[i]);
+}
+ 
+     printf("\nThe Allocated Resource Table:\n");
+     for (i = 0; i < processes; i++)
+{
+        for (j = 0; j < resources; j++)
+{
+             printf("\t%d", current[i][j]);
+         }
+printf("\n");
+     }
+ 
+     printf("\nThe Maximum Claim Table:\n");
+     for (i = 0; i < processes; i++)
+{
+         for (j = 0; j < resources; j++)
+{
+        printf("\t%d", maximum_claim[i][j]);
+         }
+         printf("\n");
+     }
+ 
+     for (i = 0; i < processes; i++)
+{
+         for (j = 0; j < resources; j++)
+{
+             allocation[j] += current[i][j];
+         }
+     }
+ 
+     printf("\nAllocated resources:");
+     for (i = 0; i < resources; i++)
+{
+         printf("\t%d", allocation[i]);
+     }
+ 
+     for (i = 0; i < resources; i++)
+{
+        available[i] = maxres[i] - allocation[i];
+}
+ 
+     printf("\nAvailable resources:");
+     for (i = 0; i < resources; i++)
+{
+         printf("\t%d", available[i]);
+     }
+     printf("\n");
+ 
+     while (counter != 0)
+{
+         safe = 0;
+         for (i = 0; i < processes; i++)
+{
+             if (running[i])
+{
+                 exec = 1;
+                 for (j = 0; j < resources; j++)
+{
+                     if (maximum_claim[i][j] - current[i][j] > available[j])
+{
+                         exec = 0;
+                         break;
+                     }
+                 }
+                 if (exec)
+{
+                     printf("\nProcess%d is executing\n", i + 1);
+                     running[i] = 0;
+                     counter--;
+                     safe = 1;
+ 
+                     for (j = 0; j < resources; j++)
+{
+                         available[j] += current[i][j];
+                     }
+                break;
+                 }
+             }
+         }
+         if (!safe)
+{
+             printf("\nThe processes are in unsafe state.\n");
+             break;
+         }
+else
+{
+             printf("\nThe process is in safe state");
+             printf("\nAvailable vector:");
+ 
+             for (i = 0; i < resources; i++)
+{
+                 printf("\t%d", available[i]);
+             }
+ 
+        printf("\n");
+         }
+     }
+     return 0;
+}
+
