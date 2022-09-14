@@ -5,7 +5,7 @@ int main()
 {
 int page[MAX],i,n,f,ps,off,pno;
 int choice=0;
-printf("\nEnter the no of  peges in memory: ");
+printf("\nEnter the no of  pages in memory: ");
 scanf("%d",&n);
 printf("\nEnter page size: ");
 scanf("%d",&ps);
